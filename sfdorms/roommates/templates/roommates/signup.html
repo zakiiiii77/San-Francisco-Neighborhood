@@ -9,6 +9,13 @@
     </head>
     <body>
         <h2>Sign Up</h2>
+        
+        {% load socialaccount %}
+        {% providers_media_js %}
+        {% for provider in socialaccount_providers %}
+            <p><a href="{% provider_login_url provider.id %}">Sign up with {{ provider.name }}</a></p>
+        {% endfor %}
+
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}

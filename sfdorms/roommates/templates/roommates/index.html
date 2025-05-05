@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,8 +10,11 @@
     </head>
     <body>
         {% if user.is_authenticated %}
-            <p>Welcome, {{ user.name }}!</p>
-            <a href="{% url 'logout' %}"><button>Logout</button></a>
+            <p>Welcome, {{ user.get_full_name|default:user.username }}!</p>
+            <form method="post" action="{% url 'account_logout' %}">
+                {% csrf_token %}
+                <button>Logout</button>
+            </form>
         {% else %}
             <a href="{% url 'login' %}"><button>Login</button></a>
             <a href="{% url 'signup' %}"><button>Sign Up</button></a>
