@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create Room</h2>
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Room name" required>
+    <button type="submit">Create</button>
+</form>
+<a href="{% url 'room_list' %}">Back to Room List</a>
+{% endblock %}

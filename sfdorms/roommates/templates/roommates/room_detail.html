@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+{% load widget_tweaks %}
+<div class="container mt-4">
+    <h2>{{ room.name }} - To-Do List</h2>
+
+    <!-- To-Do List -->
+     <ul class="list-group mb-4" id="todo-list">
+        {% for item in room.todo_items.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{  item.task }}
+                <div>
+                    <a href="{% url 'edit_todo' room.id item.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_todo' room.id item.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">No tasks yet.</li>
+        {% endfor %}
+     </ul>
+    
+    <!-- Add Task -->
+     <form method="post" class="mb-3">
+        {% csrf_token %}
+        {{ form.task.label_tag }}
+        {{ form.task|add_class:"form-control mb-2" }}
+        <button type="submit" class="btn btn-primary">Add Task</button>
+     </form>
+
+    <!-- Member Management -->
+     <h5>Room Members:</h5>
+     <ul class="list-group mb-3">
+        {% for member in room.member.all %}
+            <li class="list-group-item d-flex justify-content-between">
+                {{ member.username }}
+                {% if user == room.owner %}
+                    <form method="post" action="{% url 'remove_member' room.id member.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+     </ul>
+
+     <form method="post" action="{% url 'add_member' room.id %}">
+        {% csrf_token %}
+        <input type="text" name="username" class="form-control mb-2" placeholder="Add member by username">
+        <button type="submit" class="btn btn-success">Add Member</button>
+     </form>
+</div>
+{% endblock %}

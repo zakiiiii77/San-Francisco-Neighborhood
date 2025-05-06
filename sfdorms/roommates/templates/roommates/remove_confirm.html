@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card mt-5">
+    <div class="card-body text-center">
+        <h5>Remove {{ member.username }} from {{ room.name }}?</h5>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, remove</button>
+            <a href="{% url 'room_detail' room.id %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
