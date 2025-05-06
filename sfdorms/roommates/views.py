@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from .models import Room, TodoItem
+from .models import Room, TodoItem, Task
 from .forms import ToDoItemForm
 from django.contrib.auth.models import User
 
@@ -109,3 +109,10 @@ def remove_member(request, room_id, user_id):
 def room_detail_api(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     return render(request, "roommates/todo_list_partial.html", {"room": room})
+
+def add_task(request):
+    if request.method == 'POST':
+        task_name = request.POST.get("task_name")
+        if task_name:
+            Task.objects.create(name=task_name, user=request.user)
+        return redirect('room_detail', room_name=request.user.username)

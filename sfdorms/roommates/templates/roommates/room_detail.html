@@ -6,9 +6,9 @@
 
     <!-- To-Do List -->
      <ul class="list-group mb-4" id="todo-list">
-        {% for item in room.todo_items.all %}
+        {% for item in room.todos.all %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{  item.task }}
+                {{  item.text }}
                 <div>
                     <a href="{% url 'edit_todo' room.id item.id %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'delete_todo' room.id item.id %}" class="btn btn-sm btn-danger">Delete</a>
@@ -20,11 +20,12 @@
      </ul>
     
     <!-- Add Task -->
-     <form method="post" class="mb-3">
+     <button id="add-task-btn" type="submit" class="btn btn-primary">Add Task</button>
+
+     <form method="post" action="{% url 'add_todo' room.id %}" class="mb-3" id="task-form" style="display: none; margin-top: 10px;">
         {% csrf_token %}
-        {{ form.task.label_tag }}
-        {{ form.task|add_class:"form-control mb-2" }}
-        <button type="submit" class="btn btn-primary">Add Task</button>
+        <input type="text" name="text" placeholder="Enter task" required>
+        <button type="submit" class="btn btn-success">Submit</button>        
      </form>
 
     <!-- Member Management -->
@@ -49,4 +50,11 @@
         <button type="submit" class="btn btn-success">Add Member</button>
      </form>
 </div>
+
+<script>
+    document.getElementById("add-task-btn").addEventListener("click", function() {
+        const form = document.getElementById("task-form");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    });
+</script>
 {% endblock %}

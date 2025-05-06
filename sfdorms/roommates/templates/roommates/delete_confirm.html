@@ -6,7 +6,7 @@
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Yes, delete</button>
-            <a href="{% url 'room_detail' object.room.id %}" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'room_detail' todo.room.id %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>
