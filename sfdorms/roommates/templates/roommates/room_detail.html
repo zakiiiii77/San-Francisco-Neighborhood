@@ -49,6 +49,8 @@
         <input type="text" name="username" class="form-control mb-2" placeholder="Add member by username">
         <button type="submit" class="btn btn-success">Add Member</button>
      </form>
+
+     <button method="post" action="{% url 'call' room.id %}">Call</button>
 </div>
 
 <script>

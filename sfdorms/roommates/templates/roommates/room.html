@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Voice Call Room</title>
+    </head>
+    <body>
+        <h2>Voice Call Room</h2>
+
+        <div id="classStatus">Status: Not connected</div>
+        <div id="remoteUser">Remote user: N/A</div>
+
+        <button id="startCall">Start Call</button>
+        <button id="muteBtn">Mute</button>
+        <button id="hangupBtn">Hang Up</button>
+
+        <audio src="remoteAudio" autoplay></audio>
+
+        <script src="{% static 'js/voice_call.js' %}"></script>
+        <script>
+            window.currentUsername = "{{ request.user.username }}";
+            const roomName = "{{ room_name|escapejs }}";
+        </script>
+    </body>
+</html>
