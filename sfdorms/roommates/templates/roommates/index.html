@@ -6,9 +6,72 @@
         <link rel="stylesheet" href="{% static 'roommates/style.css' %}">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>San Francisco Roommates</title>
+        <title>RoomSync Dashboard</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config ={
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: '#780116',
+                            yellowish: '#F7B538',
+                            orange: '#DB7C26',
+                            brick: '#D8572A',
+                            crimson: '#C32F27',
+                        }
+                    }
+                }
+            }
+        </script>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            :root{
+                --deep-red: #780116;
+                --warm-yellow: #F7B538;
+                --burnt-orange: #DB7C26;
+                --brick-red: #D8572A;
+                --crimson: #C32F27;
+                --light-bg: #f9f9f9;
+            }
+          *{
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body{
+                font-family: 'Poppins', sans-serif;
+                background: linear-gradient(to right, var(--deep-red), var(--crimson));
+                color: #fff;
+                padding: 20px;
+                min-height: 100vh;
+            }
+            header{
+                background: linear-gradient(135deg, var(--deep-red), var(--brick-red));
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                margin-bottom: 30px;
+                text-align: center;
+            }
+            button {
+                padding: 0.7rem 1.5rem;
+                margin: 0.5rem;
+                border: none;
+                border-radius: 12px;
+                background-color: var(--warm-yellow);
+                color: #000;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.3s ease, transform 0.2s ease;
+            }
+        </style>
     </head>
-    <body>
+    <body class ="body">
+        <header class="header">
+            <div class="container1">
+                <h1 class="h1 text-5xl font-extrabold tracking-widest retro-glow">RoomSync</h1>
+            </div>
+        </header>
     {% providers_media_js %}
 
     <p>Providers: {{ socialaccount_providers }}</p>
@@ -20,13 +83,13 @@
                 <button>Logout</button>
             </form>
         {% else %}
-            <a href="{% url 'login' %}"><button>Login</button></a>
-            <a href="{% url 'signup' %}"><button>Sign Up</button></a>
+            <a href="{% url 'login' %}"><button class="border-2 border-white text-white px-4 py-2 rounded hover:bg-white hover:text-primary transition">Login</button></a>
+            <a href="{% url 'signup' %}"><button class= "border-2 border-white text-white px-4 py-2 rounded hover:bg-white hover:text-primary transition">Sign Up</button></a>
         {% endif %}
 
-        <h1>Hello from Cairo! We are coming soon San Francisco</h1>
-        <a target="_blank" href="{% url 'about' %}"><button>About</button></a>
-        <a target="_blank" href="{% url 'contact' %}"><button>Contact</button></a>
+        <h1>Hello, Welcome to RoomSync!</h1>
+        <a class="footer-text" target="_blank" href="{% url 'about' %}"><button >About</button></a>
+        <a class="footer-text" target="_blank" href="{% url 'contact' %}"><button>Contact</button></a>
         <a target="_blank" href="{% url 'room_list' %}"><button>My Rooms</button></a>
     </body>
 </html>
