@@ -2,12 +2,13 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, JsonResponse
-from .models import Comment, Room, TodoItem
+from django.http import HttpResponseForbidden, JsonResponse, HttpResponseRedirect
+from .models import Comment, Room, TodoItem, Task, RoomMember
 from .forms import ToDoItemForm, CommentForm
 from django.contrib.auth.models import User
-from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
+from django.urls import reverse
+from django.views.decorators.http import require_GET
 
 # Create your views here.
 
@@ -48,6 +49,7 @@ def create_room(request):
 @login_required
 def room_detail(request, room_id):
     room = get_object_or_404(Room, id=room_id)
+    roommates = room.members.all()
     if request.user not in room.members.all():
         return HttpResponseForbidden("You are not a member of this room.")
     todos = room.todos.prefetch_related('comments__user')
@@ -66,8 +68,9 @@ def room_detail(request, room_id):
     comment_form = CommentForm()
     return render(request, 'roommates/room_detail.html', {
         'room': room, 
-        'todos': todos,
-        'comment_form': comment_form
+        'todos': todos, 
+        'comment_form': comment_form,
+        'roommates': roommates
     })
 
 @login_required
@@ -147,3 +150,39 @@ def delete_comment(request, comment_id):
         comment.delete()
         return  JsonResponse({"success": True})
     return JsonResponse({"success": False, 'error': 'Not authorized'}, status=403) 
+
+def mark_todo_done(request, todo_id):
+    todo = get_object_or_404(TodoItem, id = todo_id)
+    if request.method == 'POST':
+        todo.is_done = True
+        todo.save()
+    return redirect('room_detail', room_id=todo.room.id)
+
+def room_dashboard(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    members = room.roommember_set.all()
+    tasks = room.task_set.all()
+    return render(request, 'dashboard.html', {
+        'room': room,
+        'members': members,
+        'tasks': tasks
+    })
+
+def comlete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    if not task.is_completed:
+        task.is_completed = True
+        task.completed_by = request.user
+        task.save()
+
+        room_member = RoomMember.objects.get(user=request.user, room=task.room)
+        room_member.points += 10
+        room_member.save()
+
+    return render(request, 'partials/task_item.html', {'task': task})
+
+@require_GET
+def room_members_partial(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    members = room.roommember_set.all()
+    return render(request, 'partials/members.list.html', {'members': members})

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Room(models.Model):
     name = models.CharField(max_length=100)
-    members = models.ManyToManyField(User, related_name='rooms')
+    members = models.ManyToManyField(User, related_name='rooms', through='RoomMember')
 
     def __str__(self):
         return self.name
@@ -28,3 +28,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} on {self.todo.text}"
+
+class RoomMember(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    points = models.IntegerField(default=0)
+
+class Task(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255)
+    completed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    is_completed = models.BooleanField(default=False)

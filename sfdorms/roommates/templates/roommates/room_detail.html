@@ -2,6 +2,7 @@
 {% block content %}
 {% load static %}
 {% load widget_tweaks %}
+{% load humanize %}
 <div class="container mt-4">
     <h2>{{ room.name }} 's Room</h2>
 
@@ -11,9 +12,17 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
                     <strong>{{  item.text }}</strong><br>
-                    <small class="text-muted">Added by: {{ item.created_by.username }}</small>
+                    <small class="text-muted">Added by: {{ item.created_by.username }} - {{ item.created_at|naturaltime }}</small>
                 </div>
                 <div>
+                    {% if not item.is_done %}
+                        <form action="{% url 'mark_done' item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Mark as Done</button>
+                        </form>
+                    {% else %}
+                        ✅
+                    {% endif %}
                     <a href="{% url 'edit_todo' room.id item.id %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'delete_todo' room.id item.id %}" class="btn btn-sm btn-danger">Delete</a>
                 </div>
@@ -49,11 +58,13 @@
      </form>
 
     <!-- Member Management -->
-     <h5>Room Members:</h5>
+
+
+     <h5>Roommates in {{ room.name }}:</h5>
      <ul class="list-group mb-3">
-        {% for member in room.member.all %}
+        {% for user in roommates %}
             <li class="list-group-item d-flex justify-content-between">
-                {{ member.username }}
+                {{ user.username }}
                 {% if user == room.owner %}
                     <form method="post" action="{% url 'remove_member' room.id member.id %}">
                         {% csrf_token %}

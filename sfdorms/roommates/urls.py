@@ -17,5 +17,9 @@ urlpatterns = [
     path('rooms/<int:room_id>/todos/<int:todo_id>/edit/', views.edit_todo, name='edit_todo'),
     path('rooms/<int:room_id>/todos/<int:todo_id>/remove/', views.delete_todo, name='delete_todo'),
     path('todo/<int:todo_id>/add_comment/', views.add_comment, name='add_comment'),
-    path('comments/<int:comment_id>/delete/', views.delete_comment, name='delete_comment')
+    path('comments/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
+    path('todo/<int:todo_id>/done/', views.mark_todo_done, name='mark_done'),
+    path('room/<int:room_id>/dashboard/', views.room_dashboard, name='room_dashboard'),
+    path('task/<int:task_id>/complete/', views.comlete_task, name='complete_task'),
+    path('room/<int:room_id>/members', views.room_members_partial, name='room_members_partial'),
 ]
