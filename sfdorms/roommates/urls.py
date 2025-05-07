@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, consumers
+from . import views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -16,4 +16,6 @@ urlpatterns = [
     path('rooms/<int:room_id>/add-member', views.add_member, name='add_member'),
     path('rooms/<int:room_id>/todos/<int:todo_id>/edit/', views.edit_todo, name='edit_todo'),
     path('rooms/<int:room_id>/todos/<int:todo_id>/remove/', views.delete_todo, name='delete_todo'),
+    path('todo/<int:todo_id>/add_comment/', views.add_comment, name='add_comment'),
+    path('comments/<int:comment_id>/delete/', views.delete_comment, name='delete_comment')
 ]
