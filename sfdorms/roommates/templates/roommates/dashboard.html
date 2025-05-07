@@ -1,0 +1,27 @@
+<h1>Room: {{ room.name }}</h1>
+
+<h2>Members</h2>
+<div id="member-list" hx-get="{% url 'room_members_partial' room.id %}" hx-trigger="load, every 5s">
+
+</div>
+
+<h2>Tasks</h2>
+<ul id="task-list">
+    {% for task in tasks %}
+        <li id="task-{{ task.id }}">
+            {{ task.description }}
+            {% if not task.is_completed %}
+                <form 
+                    hx-post="{% url 'comlete_task' task.id %}"
+                    hx-target="#task-{{ task.id }}"
+                    hx-swap="outerHTML"
+                >
+                    {% csrf_token %}
+                    <button type="submit">Complete</button>
+                </form>
+            {% else %}
+                ✅ Done by {{ task.completed_by.username }}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

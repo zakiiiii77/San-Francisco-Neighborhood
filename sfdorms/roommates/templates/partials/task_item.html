@@ -1,0 +1,15 @@
+<li id="task-{{ task.id }}">
+    {{ task.description }}
+    {% if task.is_completed %}
+        ✅ Done by {{ task.completed_by.username }}
+    {% else %}
+        <form 
+            hx-post="{% url 'comlete_task' task.id %}"
+            hx-target="#task-{{ task.id }}"
+            hx-swap="outerHTML"
+        >
+            {% csrf_token %}
+            <button type="submit">Complete</button>
+        </form>
+    {% endif %}
+</li>
