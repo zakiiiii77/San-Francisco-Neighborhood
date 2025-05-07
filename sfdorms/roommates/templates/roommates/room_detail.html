@@ -1,17 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
 {% load widget_tweaks %}
 <div class="container mt-4">
-    <h2>{{ room.name }} - To-Do List</h2>
+    <h2>{{ room.name }} 's Room</h2>
 
     <!-- To-Do List -->
      <ul class="list-group mb-4" id="todo-list">
         {% for item in room.todos.all %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{  item.text }}
+                <div>
+                    <strong>{{  item.text }}</strong><br>
+                    <small class="text-muted">Added by: {{ item.created_by.username }}</small>
+                </div>
                 <div>
                     <a href="{% url 'edit_todo' room.id item.id %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'delete_todo' room.id item.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+                <div class="mt-2 ps-3">
+                    <div id="comments-{{ item.id }}">
+                        <strong>Comments</strong>
+                        {% for comment in item.comments.all %}
+                            {% include "roommates/comment.html" with comment=comment %}
+                        {% empty %}
+                            <div class="text-muted">No comments yet.</div>
+                        {% endfor %}
+                    </div>
+
+                    <form class="add-comment-form mt-2" data-task-id="{{ item.id }}">
+                        {% csrf_token %}
+                        <input type="text" name="text" class="form-control form-control-sm mb-1" placeholder="Add a comment">
+                        <button type="submit" class="btn btn-sm btn-secondary">Submit</button>
+                    </form>
                 </div>
             </li>
         {% empty %}
@@ -49,8 +69,6 @@
         <input type="text" name="username" class="form-control mb-2" placeholder="Add member by username">
         <button type="submit" class="btn btn-success">Add Member</button>
      </form>
-
-     <button method="post" action="{% url 'call' room.id %}">Call</button>
 </div>
 
 <script>
@@ -58,5 +76,30 @@
         const form = document.getElementById("task-form");
         form.style.display = form.style.display === "none" ? "block" : "none";
     });
+
+    document.querySelectorAll(".add-comment-form").forEach(form => {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const taskId = this.getAttribute("data-task-id");
+            const formData = new FormData(this);
+
+            fetch(`/todo/${taskId}/add_comment/`, {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': form.querySelector('[name="csrfmiddlewaretoken"]').value
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const commentsDiv = document.getElementById(`comments-${taskId}`);
+                    commentsDiv.insertAdjacentHTML("beforeend", data.html);
+                    this.reset();
+                }
+            });
+        }) ;
+    });
 </script>
+<script src="{% static 'js/delete_comment.js' %}"></script>
 {% endblock %}

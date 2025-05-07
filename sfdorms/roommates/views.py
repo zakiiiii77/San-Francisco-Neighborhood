@@ -2,10 +2,12 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from .models import Room, TodoItem, Task
-from .forms import ToDoItemForm
+from django.http import HttpResponseForbidden, JsonResponse
+from .models import Comment, Room, TodoItem
+from .forms import ToDoItemForm, CommentForm
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -48,8 +50,25 @@ def room_detail(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     if request.user not in room.members.all():
         return HttpResponseForbidden("You are not a member of this room.")
-    todos = room.todos.all()
-    return render(request, 'roommates/room_detail.html', {'room': room, 'todos': todos})
+    todos = room.todos.prefetch_related('comments__user')
+
+    if request.method == 'POST' and 'comment-task-id' in request.POST:
+        task_id = request.POST.get('comment-task-id')
+        task = get_object_or_404(TodoItem, id=task_id, room=room)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.task = task
+            comment.user = request.user
+            comment.save()
+            return redirect('room_detail', room_id=room.id)
+        
+    comment_form = CommentForm()
+    return render(request, 'roommates/room_detail.html', {
+        'room': room, 
+        'todos': todos,
+        'comment_form': comment_form
+    })
 
 @login_required
 def add_todo(request, room_id):
@@ -60,7 +79,7 @@ def add_todo(request, room_id):
     if request.method == 'POST':
         text = request.POST.get('text')
         if text:
-            TodoItem.objects.create(room=room, text=text)
+            TodoItem.objects.create(room=room, text=text, created_by=request.user)
     return redirect('room_detail', room_id=room.id)
 
 @login_required
@@ -110,9 +129,21 @@ def room_detail_api(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     return render(request, "roommates/todo_list_partial.html", {"room": room})
 
-def add_task(request):
+@login_required
+def add_comment(request, todo_id):
     if request.method == 'POST':
-        task_name = request.POST.get("task_name")
-        if task_name:
-            Task.objects.create(name=task_name, user=request.user)
-        return redirect('room_detail', room_name=request.user.username)
+        todo = get_object_or_404(TodoItem, id=todo_id)
+        text = request.POST.get('text')
+        if text:
+            comment = Comment.objects.create(todo=todo, user=request.user, text=text)
+            html = render_to_string('roommates/comment.html', {'comment': comment})
+            return JsonResponse({'success': True, 'html': html})
+    return JsonResponse({'success': False}, status=400)
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.user == comment.user:
+        comment.delete()
+        return  JsonResponse({"success": True})
+    return JsonResponse({"success": False, 'error': 'Not authorized'}, status=403) 

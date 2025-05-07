@@ -14,16 +14,17 @@ class TodoItem(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='todos')
     text = models.CharField(max_length=255)
     is_done = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.text
     
-class Task(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='tasks')
-    name = models.CharField(max_length=255)
+class Comment(models.Model):
+    todo = models.ForeignKey(TodoItem, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks')
-    is_done = models.BooleanField(default=False)
 
-    def _str_(self):
-        return self.name
+    def __str__(self):
+        return f"{self.user.username} on {self.todo.text}"
