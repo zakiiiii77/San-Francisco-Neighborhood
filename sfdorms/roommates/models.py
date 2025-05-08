@@ -37,5 +37,6 @@ class RoomMember(models.Model):
 class Task(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     description = models.CharField(max_length=255)
-    completed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    completed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='completed_tasks')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_tasks', null=True)
     is_completed = models.BooleanField(default=False)

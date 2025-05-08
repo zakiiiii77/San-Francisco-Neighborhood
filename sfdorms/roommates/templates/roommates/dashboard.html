@@ -1,27 +1,58 @@
-<h1>Room: {{ room.name }}</h1>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ room.name }} Dashboard</h2>
 
-<h2>Members</h2>
-<div id="member-list" hx-get="{% url 'room_members_partial' room.id %}" hx-trigger="load, every 5s">
-
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4>Members</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for member in members %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ member.user.username }}
+                                <span class="badge bg-success">{{ member.points }} pts</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h4>Tasks</h4>
+                </div>
+                <div class="card-body">
+                    {% if tasks %}
+                        <ul class="list-group">
+                            {% for task in tasks %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ task.description }}
+                                    {% if task.is_completed %}
+                                        <span>
+                                            ✅ Completed by {{ task.completed_by.username }}
+                                        </span>
+                                    {% else %}
+                                        <form method="post" action="{% url 'complete_task' task.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                Mark Complete
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <li class="list-group-item">No tasks created yet.</li>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<h2>Tasks</h2>
-<ul id="task-list">
-    {% for task in tasks %}
-        <li id="task-{{ task.id }}">
-            {{ task.description }}
-            {% if not task.is_completed %}
-                <form 
-                    hx-post="{% url 'comlete_task' task.id %}"
-                    hx-target="#task-{{ task.id }}"
-                    hx-swap="outerHTML"
-                >
-                    {% csrf_token %}
-                    <button type="submit">Complete</button>
-                </form>
-            {% else %}
-                ✅ Done by {{ task.completed_by.username }}
-            {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+{% endblock %}

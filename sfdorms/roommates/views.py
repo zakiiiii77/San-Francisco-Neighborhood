@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_GET
+from django.contrib import messages
 
 # Create your views here.
 
@@ -112,6 +113,7 @@ def add_member(request, room_id):
         username = request.POST.get("username")
         user = User.objects.filter(username=username).first()
         if user:
+            RoomMember.objects.get_or_create(user=user, room=room)
             room.members.add(user)
             room.save()
         return redirect("room_detail", room_id=room_id)
@@ -160,29 +162,63 @@ def mark_todo_done(request, todo_id):
 
 def room_dashboard(request, room_id):
     room = get_object_or_404(Room, id=room_id)
-    members = room.roommember_set.all()
-    tasks = room.task_set.all()
-    return render(request, 'dashboard.html', {
+    members = room.roommember_set.all().order_by('-points')
+    tasks = Task.objects.filter(room=room)
+    return render(request, 'roommates/dashboard.html', {
         'room': room,
         'members': members,
         'tasks': tasks
     })
 
-def comlete_task(request, task_id):
+def complete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if not task.is_completed:
         task.is_completed = True
         task.completed_by = request.user
         task.save()
 
-        room_member = RoomMember.objects.get(user=request.user, room=task.room)
+        room_member, created = RoomMember.objects.get_or_create(
+            user=request.user, 
+            room=task.room
+        )
         room_member.points += 10
         room_member.save()
 
-    return render(request, 'partials/task_item.html', {'task': task})
+    return redirect('room_dashboard', room_id=task.room.id)
 
 @require_GET
 def room_members_partial(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     members = room.roommember_set.all()
     return render(request, 'partials/members.list.html', {'members': members})
+
+@login_required
+def add_task(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    
+    # Verify user is a room member
+    if not room.members.filter(id=request.user.id).exists():
+        return HttpResponseForbidden("You're not a member of this room")
+    
+    if request.method == "POST":
+        # Fix typo in 'description' parameter
+        description = request.POST.get('description')  # Changed from 'descripstion'
+        
+        if description:
+            # Create task with logged-in user as creator
+            Task.objects.create(
+                room=room,
+                description=description,
+                created_by=request.user  # Add creator tracking
+            )
+            messages.success(request, "Task created successfully!")
+        else:
+            messages.error(request, "Task description cannot be empty")
+    
+    return redirect('room_dashboard', room_id=room.id)
+
+@login_required
+def create_task(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    if request.method == 'POST':
+        description = request.POST.get()
