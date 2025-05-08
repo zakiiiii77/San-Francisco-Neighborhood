@@ -1,9 +1,7 @@
 {% load humanize %}
 
-<div id="comment-{{ comment.id }}" class="mb-2">
-    <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
-    <small class="text-muted">- {{ comment.created_at|naturaltime }}</small>
-    {% if comment.user == request.user %}
-        <button class="btn btn-sm btn-danger delete-comment-btn" data-comment-id="{{ comment.id }}">Delete</button>
-    {% endif %}
-</div> 
+<div class="comment">
+    <strong>{{ comment.user.username }}</strong>
+    <span class="text-muted">{{ comment.created_at|naturaltime }}</span>
+    <p>{{ comment.text }}</p>
+</div>

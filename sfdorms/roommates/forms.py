@@ -1,6 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
-from .models import TodoItem, Comment
+from .models import Task, Comment
 
 class CustomSignupForm(SignupForm):
     first_name = forms.CharField(max_length=30, label='First Name')
@@ -13,10 +13,10 @@ class CustomSignupForm(SignupForm):
         user.save()
         return user
     
-class ToDoItemForm(forms.ModelForm):
+class TaskForm(forms.ModelForm):
     class Meta:
-        model = TodoItem
-        fields = ['room', 'text', 'is_done']
+        model = Task
+        fields = ['description']
 
 class CommentForm(forms.ModelForm):
     class Meta:

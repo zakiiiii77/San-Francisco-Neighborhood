@@ -16,160 +16,100 @@
         </div>
         <div class="card-body">
             <ul class="list-group">
-                {% for task in room.task_set.all %}
+                {% for task in tasks %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            {{  task.description }}
+                        
+                        <!--Task Content-->
+                        <div class="d-flex justify-content-between align-items-center">
+                            {{ task.description }}
                             {% if task.is_completed %}
-                                <small class="text-muted">
+                                <small class="d-flex justify-content-between align-items-center">
                                     ✅ Completed by {{ task.completed_by.username }}
                                     ({{ task.completed_at|naturaltime }})
                                 </small>
                             {% endif %}
                         </div>
-                        {% if not task.is_completed %}
-                        <form method="post" action="{% url 'complete_task' task.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success">
-                                Complete (+10 pts)
-                            </button>
-                        </form>
-                        {% endif %}
+
+                        <!-- Buttons and comments -->
+                        <div>
+                            {% if not task.is_completed %}
+                                <form method="post" action="{% url 'complete_task' task.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">Mark Complete</button>
+                                </form>
+                            {% endif %}
+                                <form method="post" action="{% url 'add_comment' task.id %}">
+                                    {% csrf_token %}
+                                    <input type="text" name="text" class="form-control form-control-sm mb-1" placeholder="Add a comment">
+                                    <button type="submit" class="btn btn-sm btn-secondary">Comment</button>
+                                </form>
+                            <a href="{% url 'edit_task' room.id task.id %}" class="btn btn-sm btn-warning">Edit</a>
+                            <form method="post" action="{% url 'delete_task' room.id task.id %}" style="display: inline;"> 
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
                     </li>
+
+                    <!-- Comments section -->
+                    <div class="mt-2">
+                        <div id="comments-{{ task.id }}">
+                            <strong>Comments</strong>
+                            {% for comment in task.comments.all %}
+                                {% include "roommates/comment.html" with comment=comment %}
+                            {% empty %}
+                                <div class="text-muted">No comments yet.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 {% empty %}
-                    <li class="list-group-item text-muted">No point tasks yet</li>
-                {% endfor %}
+                    <li class="list-group-item text-muted">No Point tasks yet</li>
+                   {% endfor %}
             </ul>
 
+            <!--Task creation form-->
             <form method="post" action="{% url 'add_task' room.id %}" class="mt-3">
                 {% csrf_token %}
                 <div class="input-group">
-                    <input type="text" name="description"
-                           class="form-control"
-                           placeholder="New point task" required>
+                    <input type="text" name="description" class="form-control" placeholder="New point task" required>
                     <button type="submit" class="btn btn-primary">
                         Add Point Task
                     </button>
                 </div>
             </form>
-            <a href="{% url 'add_task' room.id %}" class="btn btn-primary mb-3">
-                Create New Task
-            </a>
         </div>
     </div>
-
-    <!-- To-Do List -->
-     <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">
-            <h4>Checklist Items</h4>
-        </div>
-        <div class="card-body">
-            <ul class="list-group mb-4" id="todo-list">
-                {% for item in room.todos.all %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{  item.text }}</strong><br>
-                            <small class="text-muted">Added by: {{ item.created_by.username }} - {{ item.created_at|naturaltime }}</small>
-                        </div>
-                        <div>
-                            {% if not item.is_done %}
-                                <form action="{% url 'mark_done' item.id %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit">Mark as Done</button>
-                                </form>
-                            {% else %}
-                                ✅
-                            {% endif %}
-                            <a href="{% url 'edit_todo' room.id item.id %}" class="btn btn-sm btn-warning">Edit</a>
-                            <a href="{% url 'delete_todo' room.id item.id %}" class="btn btn-sm btn-danger">Delete</a>
-                        </div>
-                        <div class="mt-2 ps-3">
-                            <div id="comments-{{ item.id }}">
-                                <strong>Comments</strong>
-                                {% for comment in item.comments.all %}
-                                    {% include "roommates/comment.html" with comment=comment %}
-                                {% empty %}
-                                    <div class="text-muted">No comments yet.</div>
-                                {% endfor %}
-                            </div>
-        
-                            <form class="add-comment-form mt-2" data-task-id="{{ item.id }}">
-                                {% csrf_token %}
-                                <input type="text" name="text" class="form-control form-control-sm mb-1" placeholder="Add a comment">
-                                <button type="submit" class="btn btn-sm btn-secondary">Submit</button>
-                            </form>
-                        </div>
-                    </li>
-                {% empty %}
-                    <li class="list-group-item text-muted">No tasks yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-     </div>
-    
-    <!-- Add Task -->
-     <button id="add-task-btn" type="submit" class="btn btn-primary">Add Task</button>
-
-     <form method="post" action="{% url 'add_todo' room.id %}" class="mb-3" id="task-form" style="display: none; margin-top: 10px;">
-        {% csrf_token %}
-        <input type="text" name="text" placeholder="Enter task" required>
-        <button type="submit" class="btn btn-success">Submit</button>        
-     </form>
 
     <!-- Member Management -->
 
 
-     <h5>Roommates in {{ room.name }}:</h5>
-     <ul class="list-group mb-3">
-        {% for user in roommates %}
-            <li class="list-group-item d-flex justify-content-between">
-                {{ user.username }}
-                {% if user == room.owner %}
-                    <form method="post" action="{% url 'remove_member' room.id member.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-     </ul>
+    <h5>Roommates in {{ room.name }}:</h5>
+    <ul class="list-group mb-3">
+       {% for user in roommates %}
+           <li class="list-group-item d-flex justify-content-between">
+               {{ user.username }}
+               {% if user == room.owner %}
+                   <form method="post" action="{% url 'remove_member' room.id member.id %}">
+                       {% csrf_token %}
+                       <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                   </form>
+               {% endif %}
+           </li>
+       {% endfor %}
+    </ul>
 
-     <form method="post" action="{% url 'add_member' room.id %}">
-        {% csrf_token %}
-        <input type="text" name="username" class="form-control mb-2" placeholder="Add member by username">
-        <button type="submit" class="btn btn-success">Add Member</button>
-     </form>
+    <form method="post" action="{% url 'add_member' room.id %}">
+       {% csrf_token %}
+       <input type="text" name="username" class="form-control mb-2" placeholder="Add member by username">
+       <button type="submit" class="btn btn-success">Add Member</button>
+    </form>
 </div>
 
-<script>
-    document.getElementById("add-task-btn").addEventListener("click", function() {
-        const form = document.getElementById("task-form");
-        form.style.display = form.style.display === "none" ? "block" : "none";
-    });
+{% for task in tasks %}
+    <div id="urls" data-add-comment-url="{% url 'add_comment' task.id %}"></div>
+{% endfor %}
 
-    document.querySelectorAll(".add-comment-form").forEach(form => {
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            const taskId = this.getAttribute("data-task-id");
-            const formData = new FormData(this);
-
-            fetch(`/todo/${taskId}/add_comment/`, {
-                method: "POST",
-                headers: {
-                    'X-CSRFToken': form.querySelector('[name="csrfmiddlewaretoken"]').value
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const commentsDiv = document.getElementById(`comments-${taskId}`);
-                    commentsDiv.insertAdjacentHTML("beforeend", data.html);
-                    this.reset();
-                }
-            });
-        }) ;
-    });
-</script>
+<script src="{% static 'room_detail.js' %}"></script>
 <script src="{% static 'js/delete_comment.js' %}"></script>
+                
 {% endblock %}

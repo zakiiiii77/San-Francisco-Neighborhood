@@ -3,10 +3,193 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="{% static 'roommates/style.css' %}">
+        <style>
+            *{
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+            }
+
+            .container{
+                width: 100%;
+                padding-left: 8%;
+                padding-right: 8%;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            .navbar{
+                width: 100%;
+                display: flex;
+                align-items: center;
+            }
+
+            .logo{
+                width: 50px;
+                cursor: pointer;
+                margin: 30px 0;
+            }
+
+            .menu-icon{
+                width: 25px;
+                cursor: pointer;
+            }
+
+            nav{
+                flex: 1;
+                text-align: right;
+            }
+
+            nav ul li{
+                list-style: none;
+                display: inline-block;
+                margin-right: 30px;
+            }
+
+            nav ul li a{
+                text-decoration: none;
+                color: #000;
+                font-size: 14px;
+            }
+
+            nav ul li a:hover{
+                color: #C32F27;
+            }
+
+            .row{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 100px 0;
+            }
+
+            .col-1{
+                flex-basis: 40%;
+                position: relative;
+                margin-left: 50px;
+            }
+
+            .col-1 h2{
+                font-size: 54px;
+            }
+
+            .col-1 h3{
+                font-size: 25px;
+                color: #DB7C26;
+                font-weight: 100;
+                margin: 20px 0 10px;
+            }
+
+            .col-1 p{
+                font-size: 16px;
+                color: #F7B538;
+                font-weight: 100;
+            }
+
+            .col-1 h4{
+                margin: 30px 0;
+                font-size: 20px;
+            }
+
+            button{
+                width: 140px;
+                border: 0;
+                padding: 12px 10px;
+                outline: none;
+                color: #fff;
+                background: linear-gradient(to right, #C32F27, #D8572A, #DB7C26, #F7B538, #780116);
+                border-radius: 6px;
+                cursor: pointer;
+                transition: width 0.5s;
+            }
+
+            button img{
+                width: 30px;
+                display: none;
+            }
+
+            button:hover img{
+                display: block;
+            }
+
+            button:hover{
+                width: 160px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .linear-color{
+                width: 10px;
+                height: 57%;
+                background: linear-gradient(#C32F27, #D8572A, #DB7C26, #F7B538, #780116);
+                position: absolute;
+                left: -40px;
+                top: 8px;
+            }
+
+            .col-2{
+                position: relative;
+                flex-basis: 60%;
+                display: flex;
+                align-items: center;
+            }
+
+            .col-2 .the-most-handsome-man-thats-ever-lived{
+                width: 90%;
+            }
+
+            .color-box {
+                position: absolute;
+                right: 0;
+                top: 0;
+                background: linear-gradient(#C32F27, #D8572A, #DB7C26, #F7B538, #780116);
+                border-radius: 20px 0 0 20px;
+                height: 100%;
+                width: 80%;
+                z-index: -1;
+            }
+
+            .logout-btn{
+                background: none;
+                border: nonde;
+                color: #000;
+                font-size: 14px;
+                cursor: pointer;
+                padding: 0;
+            }
+
+            .logout-btn:hover{
+                color: #C32F27;
+            }
+
+            @keyframes shake {
+                0% { transform: rotate(0deg); }
+                25% { transform: rotate(-5deg); }
+                50% { transform: rotate(5deg); }
+                75% { transform: rotate(-5deg); }
+                100% { transform: rotate(0deg); }
+            }
+
+            .dancing-image {
+                transition: transform 0.3s;
+                cursor: pointer;
+            }
+
+            .dancing-image:hover {
+                animation: shake 0.4s infinite;
+            }
+
+            .dancing-image.touch-active {
+                animation: shake 0.4s infinite;
+            }
+        </style>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>RoomSync Dashboard</title>
+        <audio id="hover-sound">
+            <source src="{% static 'audio/the-best-singer-thats-ever-lived.m4a' %}" type="audio/mp4">
+        </audio>
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config ={
@@ -22,74 +205,98 @@
                     }
                 }
             }
+
+            const hoverAudio = document.getElementById('hover-sound');
+            function playAudio() {
+                hoverAudio.currentTime = 0;
+                hoverAudio.play().catch(error => {
+                    console.log('Audio play failed:', error);
+                });
+            }
+
+            function pauseAudio() {
+                hoverAudio.pause();
+            }
+
+            const dancingImage = document.querySelector('.the-most-handsome-man-thats-ever-lived');
+            let isPlaying = false;
+
+            dancingImage.addEventListener('mouseenter', startDance);
+            dancingImage.addEventListener('mouseleave', stopDance);
+
+            dancingImage.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent default touch behavior
+                dancingImage.classList.add('touch-active');
+                startDance();
+            });
+
+            dancingImage.addEventListener('touchend', () => {
+                dancingImage.classList.remove('touch-active');
+                stopDance();
+            });
+
+            function startDance() {
+                if (!isPlaying) {
+                    isPlaying = true;
+                    if(hoverAudio) hoverAudio.play();
+                }
+            }
+
+            function stopDance() {
+                isPlaying = false;
+                dancingImage.style.animation = 'none'; // Stop the animation
+                void dancingImage.offsetWidth; // Trigger reflow to restart the animation
+                if(hoverAudio) hoverAudio.pause();
+            }
         </script>
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <style>
-            :root{
-                --deep-red: #780116;
-                --warm-yellow: #F7B538;
-                --burnt-orange: #DB7C26;
-                --brick-red: #D8572A;
-                --crimson: #C32F27;
-                --light-bg: #f9f9f9;
-            }
-          *{
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
-            body{
-                font-family: 'Poppins', sans-serif;
-                background: linear-gradient(to right, var(--deep-red), var(--crimson));
-                color: #fff;
-                padding: 20px;
-                min-height: 100vh;
-            }
-            header{
-                background: linear-gradient(135deg, var(--deep-red), var(--brick-red));
-                padding: 20px;
-                border-radius: 15px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                margin-bottom: 30px;
-                text-align: center;
-            }
-            button {
-                padding: 0.7rem 1.5rem;
-                margin: 0.5rem;
-                border: none;
-                border-radius: 12px;
-                background-color: var(--warm-yellow);
-                color: #000;
-                font-weight: 600;
-                cursor: pointer;
-                transition: background 0.3s ease, transform 0.2s ease;
-            }
-        </style>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </head>
     <body class ="body">
-        <header class="header">
-            <div class="container1">
-                <h1 class="h1 text-5xl font-extrabold tracking-widest retro-glow">RoomSync</h1>
+        <div class="container">
+            <div class="navbar"> 
+                <img class="logo" src="" alt="">
+                <nav>
+                    <ul>
+                        <li><a href="">Home</a></li>
+                        <li><a href="{% url 'room_list' %}">My Rooms</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        {% if user.is_authenticated %}
+                            <li>
+                                <form method="post" action="{% url 'account_logout' %}">
+                                    {% csrf_token %}
+                                    <button class="logout-btn">Logout</button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <img class="menu-icon" src="" alt="">
             </div>
-        </header>
-    {% providers_media_js %}
 
-    <p>Providers: {{ socialaccount_providers }}</p>
-
-        {% if user.is_authenticated %}
-            <p>Welcome, {{ user.get_full_name|default:user.username }}!</p>
-            <form method="post" action="{% url 'account_logout' %}">
-                {% csrf_token %}
-                <button>Logout</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}"><button class="border-2 border-white text-white px-4 py-2 rounded hover:bg-white hover:text-primary transition">Login</button></a>
-            <a href="{% url 'signup' %}"><button class= "border-2 border-white text-white px-4 py-2 rounded hover:bg-white hover:text-primary transition">Sign Up</button></a>
-        {% endif %}
-
-        <h1>Hello, Welcome to RoomSync!</h1>
-        <a class="footer-text" target="_blank" href="{% url 'about' %}"><button >About</button></a>
-        <a class="footer-text" target="_blank" href="{% url 'contact' %}"><button>Contact</button></a>
-        <a target="_blank" href="{% url 'room_list' %}"><button>My Rooms</button></a>
+            <div class="row">
+                <div class="col-1">
+                    <h2>RoomSync</h2><br><h2>Welcome Back</h2>
+                    {% if user.is_authenticated %}
+                        <h3>Welcome, {{ user.get_full_name|default:user.username }}!</h3>
+                        <h4>Hello, Welcome to RoomSync!</h4>
+                        <p>See your rooms</p>
+                        <h4>Pray for me I have exams and working on this shit</h4>
+                        <a href="{% url 'room_list' %}"><button type="button">My Rooms <img src="" alt=""></button></a>
+                        <div class="linear-color"></div>
+                    {% else %}
+                        <h3>Sorry!</h3>
+                        <h4>Please, Login or Sign Up first</h4>
+                    {% endif %}
+                </div>
+                <div class="col-2">
+                    <img class="the-most-handsome-man-thats-ever-lived dancing-image" src="{% static 'images/the-most-handsome-man-thats-ever-lived.png' %}" alt="the most handsome man thats ever lived" onmouseenter="playAudio()" onmouseleave="pauseAudio()">
+                    <div class="color-box"></div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

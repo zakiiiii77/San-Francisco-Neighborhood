@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -139,6 +141,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -169,3 +177,12 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+load_dotenv()
+
+SPOTIFY_CLIENT_ID = os.getenv('aad186414a0e4471a2282d36316f31a8')
+SPOTIFY_CLIENT_SECRET = os.getenv('5648336dd6514605b3a28ee73796f7ec')
+SPOTIFY_REDIRECT_URI = os.getenv('http://127.0.0.1:8000/spotify/callback/')
+
+# For development only - remove in production
+TAILWIND_CLI_FILE = os.path.join(BASE_DIR, 'node_modules', '.bin', 'tailwind')

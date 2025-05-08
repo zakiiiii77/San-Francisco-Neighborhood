@@ -5,8 +5,9 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        <input type="text" name="description" value="{{ task.description }}">
         <button type="submit" class="btn btn-success">Save Changes</button>
-        <a href="{% url 'room_detail' todo.room.id %}" class="btn btn-secondary">Cancel</a>
+        <a href="{% url 'room_detail' room_id %}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock %}
