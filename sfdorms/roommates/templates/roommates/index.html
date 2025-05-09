@@ -163,25 +163,79 @@
                 color: #C32F27;
             }
 
-            @keyframes shake {
-                0% { transform: rotate(0deg); }
-                25% { transform: rotate(-5deg); }
-                50% { transform: rotate(5deg); }
-                75% { transform: rotate(-5deg); }
-                100% { transform: rotate(0deg); }
+            @keyframes crazy-dance {
+                0% {
+                    transform: rotate(0deg) scale(1) skew(0deg);
+                    filter: hue-rotate(0deg);
+                }
+                20% {
+                    transform: rotate(20deg) scale(1.2) skew(20deg);
+                    filter: hue-rotate(90deg);
+                }
+                40% {
+                    transform: rotate(-20deg) scale(0.8) skew(-20deg);
+                    filter: hue-rotate(180deg);
+                }
+                60% {
+                    transform: rotate(360deg) scale(1.5) skew(40deg);
+                    filter: hue-rotate(270deg);
+                }
+                80% {
+                    transform: rotate(-360deg) scale(0.5) skew(-40deg);
+                    filter: hue-rotate(360deg);
+                }
+                100% {
+                    transform: rotate(0deg) scale(1) skew(0deg);
+                    filter: hue-rotate(0deg);
+                }
             }
 
-            .dancing-image {
-                transition: transform 0.3s;
-                cursor: pointer;
+            @keyframes floating-shadow {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                    box-shadow: 20px 20px 30px rgba(255,0,0,0.5);
+                }
+                50% { 
+                    transform: translateY(-50px) rotate(180deg);
+                    box-shadow: -20px -20px 30px rgba(0,255,0,0.5);
+                }
+                100% { 
+                    transform: translateY(0) rotate(360deg);
+                    box-shadow: 20px 20px 30px rgba(0,0,255,0.5);
+                }
             }
 
-            .dancing-image:hover {
-                animation: shake 0.4s infinite;
+            .silly-animation {
+                animation: 
+                    crazy-dance 1s infinite ease-in-out,
+                    floating-shadow 2s infinite linear;
+                transition: all 0.3s;
+                border-radius: 50%;
             }
 
-            .dancing-image.touch-active {
-                animation: shake 0.4s infinite;
+            .silly-animation:hover {
+                animation: 
+                    crazy-dance 0.5s infinite steps(2),
+                    floating-shadow 1s infinite linear;
+            }
+
+            .silly-animation:hover::after {
+                content: "🎵";
+                position: absolute;
+                font-size: 3rem;
+                transform: translate(-50%, -50%);
+                animation: 
+                    party 1s infinite linear;
+            }
+
+            @keyframes party {
+                0% { transform: translate(-50%, -50%) rotate(0deg); }
+                100% { transform: translate(-50%, -50%) rotate(360deg); }
+            }
+
+            @keyframes float-up {
+                0% { transform: translateY(0) scale(1); opacity: 1; }
+                100% { transform: translateY(-100px) scale(0); opacity: 0; }
             }
         </style>
         <meta charset="UTF-8">
@@ -218,37 +272,26 @@
                 hoverAudio.pause();
             }
 
-            const dancingImage = document.querySelector('.the-most-handsome-man-thats-ever-lived');
-            let isPlaying = false;
+            const emojis = ['🎉', '🤪', '💃', '🕺', '👯', '🎊'];
+            const image = document.querySelector('.silly-animation');
 
-            dancingImage.addEventListener('mouseenter', startDance);
-            dancingImage.addEventListener('mouseleave', stopDance);
-
-            dancingImage.addEventListener('touchstart', (e) => {
-                e.preventDefault(); // Prevent default touch behavior
-                dancingImage.classList.add('touch-active');
-                startDance();
+            image.addEventListener('mouseenter', () => {
+                setInterval(() => {
+                    const emoji = document.createElement('div');
+                    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    emoji.style.position = 'absolute';
+                    emoji.style.left = `${Math.random() * 100}%`;
+                    emoji.style.animation = `float-up ${Math.random() * 2 + 1}s linear`;
+                    image.parentElement.appendChild(emoji);
+                    
+                    setTimeout(() => emoji.remove(), 2000);
+                }, 500);
             });
 
-            dancingImage.addEventListener('touchend', () => {
-                dancingImage.classList.remove('touch-active');
-                stopDance();
-            });
+            // Add this CSS
 
-            function startDance() {
-                if (!isPlaying) {
-                    isPlaying = true;
-                    if(hoverAudio) hoverAudio.play();
-                }
-            }
-
-            function stopDance() {
-                isPlaying = false;
-                dancingImage.style.animation = 'none'; // Stop the animation
-                void dancingImage.offsetWidth; // Trigger reflow to restart the animation
-                if(hoverAudio) hoverAudio.pause();
-            }
         </script>
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </head>
     <body class ="body">
@@ -293,7 +336,7 @@
                     {% endif %}
                 </div>
                 <div class="col-2">
-                    <img class="the-most-handsome-man-thats-ever-lived dancing-image" src="{% static 'images/the-most-handsome-man-thats-ever-lived.png' %}" alt="the most handsome man thats ever lived" onmouseenter="playAudio()" onmouseleave="pauseAudio()">
+                    <img class="the-most-handsome-man-thats-ever-lived silly-animation" src="{% static 'images/the-most-handsome-man-thats-ever-lived.png' %}" alt="the most handsome man thats ever lived" style="will-change: transform;" onmouseenter="playAudio()" onmouseleave="pauseAudio()">
                     <div class="color-box"></div>
                 </div>
             </div>
