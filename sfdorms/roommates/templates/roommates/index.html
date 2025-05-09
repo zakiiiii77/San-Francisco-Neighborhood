@@ -273,25 +273,24 @@
             }
 
             const emojis = ['🎉', '🤪', '💃', '🕺', '👯', '🎊'];
-            const image = document.querySelector('.silly-animation');
+const image = document.querySelector('.silly-animation');
 
-            image.addEventListener('mouseenter', () => {
-                setInterval(() => {
-                    const emoji = document.createElement('div');
-                    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                    emoji.style.position = 'absolute';
-                    emoji.style.left = `${Math.random() * 100}%`;
-                    emoji.style.animation = `float-up ${Math.random() * 2 + 1}s linear`;
-                    image.parentElement.appendChild(emoji);
-                    
-                    setTimeout(() => emoji.remove(), 2000);
-                }, 500);
-            });
+image.addEventListener('mouseenter', () => {
+    setInterval(() => {
+        const emoji = document.createElement('div');
+        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        emoji.style.position = 'absolute';
+        emoji.style.left = `${Math.random() * 100}%`;
+        emoji.style.animation = `float-up ${Math.random() * 2 + 1}s linear`;
+        image.parentElement.appendChild(emoji);
+        
+        setTimeout(() => emoji.remove(), 2000);
+    }, 500);
+});
 
-            // Add this CSS
+// Add this CSS
 
         </script>
-        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     </head>
     <body class ="body">
