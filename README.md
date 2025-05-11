@@ -1,5 +1,5 @@
 # San-Francisco-Neighborhood
-RoomSync is a beginner- friendly Django web appto help roommates track, assign, and gamify chores. Built by 5 students each in a 100 hours timeline. 
+RoomSync is a beginner- friendly Django web appto help roommates track, assign, and gamify chores. Built by 2 students each in a 100 hours timeline. 
 
 #Features
 - Household system
@@ -28,4 +28,4 @@ RoomSync is a beginner- friendly Django web appto help roommates track, assign, 
 5- 'python manage.py runserver'
 
 #Contact
-This project was built by Mohamamd Zaki, Lina Acr, Farida Ouf, Ikram, and Khalid Ibn Fakih
+This project was built by Mohamamd Zaki, and Farida Ouf
