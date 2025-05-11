@@ -97,7 +97,6 @@
                 padding: 12px 10px;
                 outline: none;
                 color: #fff;
-                background: linear-gradient(to right, #C32F27, #D8572A, #DB7C26, #F7B538, #780116);
                 border-radius: 6px;
                 cursor: pointer;
                 transition: width 0.5s;
@@ -106,17 +105,6 @@
             button img{
                 width: 30px;
                 display: none;
-            }
-
-            button:hover img{
-                display: block;
-            }
-
-            button:hover{
-                width: 160px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
             }
 
             .linear-color{
@@ -335,7 +323,7 @@ image.addEventListener('mouseenter', () => {
                     {% endif %}
                 </div>
                 <div class="col-2">
-                    <img class="the-most-handsome-man-thats-ever-lived silly-animation" src="{% static 'images/lio.png' %}" alt="the most handsome man thats ever lived" style="will-change: transform;" onmouseenter="playAudio()" onmouseleave="pauseAudio()">
+                    <img class="the-most-handsome-man-thats-ever-lived silly-animation" src="{% static 'images/the-most-handsome-man-thats-ever-lived.png' %}" alt="the most handsome man thats ever lived" style="will-change: transform;" onmouseenter="playAudio()" onmouseleave="pauseAudio()">
                     <div class="color-box"></div>
                 </div>
             </div>
